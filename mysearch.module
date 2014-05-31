@@ -82,5 +82,5 @@ function mysearch_form($form_state) {
 function  mysearch_form_submit($form, &$form_state) {
   $key = $form_state['values']['search_data'];
   $key = rtrim($key);
-  drupal_goto("mysearch/" . $key);
+  $form_state['redirect'] = 'mysearch/' . $key;
 }
