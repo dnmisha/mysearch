@@ -47,7 +47,6 @@ function mysearch_searchpage($searchterm) {
     $db_or->condition('n.title', '%' . db_like($searchterm) . '%', 'LIKE');
     $db_or->condition('b.body_value', '%' . db_like($searchterm) . '%', 'LIKE');
 
-    $items = array();
     $query->condition($db_or);
     $result = $query->execute();
     foreach ($result as $row) {
