@@ -1,0 +1,86 @@
+<?php
+
+/**
+ * Implementation of hook_permission().
+ */
+function mysearch_permission() {
+  return array(
+    'access mysearch' => array(
+      'title' => t('Access My Search'),
+      'description' => t('Allows a user to access search results'),
+    )
+  );
+}
+
+
+/**
+ * Implementation of hook_menu().
+ */
+function mysearch_menu() {
+  $items['mysearch'] = array(
+    'title' => 'Search',
+    'page callback' => 'mysearch_searchpage',
+    'page arguments' => array(1),
+    'access arguments' => array('access mysearch'),
+  );
+  return $items;
+}
+
+
+/**
+ * Menu callback provides a simple list of nodes matching the
+ * search term Example: hitting the URL:
+ *   http://domain.com/mysearch/example
+ * will return a list of links to nodes which have the word
+ * example in them.
+ */
+function mysearch_searchpage($searchterm) {
+
+  $items = array();
+  drupal_set_title(t('Search @term', array('@term' => $searchterm)));
+  if ($searchterm) {
+    $query = db_select('node', 'n');
+    $query->innerJoin('field_data_body', 'b', 'b.entity_id = n.nid');
+    $query->fields('n', array('nid', 'title'));
+
+    $db_or = db_or();
+    $db_or->condition('n.title', '%' . db_like($searchterm) . '%', 'LIKE');
+    $db_or->condition('b.body_value', '%' . db_like($searchterm) . '%', 'LIKE');
+
+    $items = array();
+    $query->condition($db_or);
+    $result = $query->execute();
+    foreach ($result as $row) {
+      $title = $row->title;
+      $nid = $row->nid;
+      $items[] = l($title, 'node/' . $nid);
+    }
+
+  }
+  $form = drupal_get_form('mysearch_form');
+  $output = drupal_render($form) . theme('item_list', array('items' => $items));
+  return $output;
+}
+/**
+ * Implementation of hook_form().
+ */
+function mysearch_form($form_state) {
+  $form['search_data'] = array(
+    '#type' => 'textfield',
+    '#title' => "Enter your keywords",
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Go',
+  );
+  return $form;
+}
+/**
+ * Implementation of hook_form_submit().
+ */
+function  mysearch_form_submit($form, &$form_state) {
+  $key = $form_state['values']['search_data'];
+  $key = rtrim($key);
+  drupal_goto("mysearch/" . $key);
+}

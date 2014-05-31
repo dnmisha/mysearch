@@ -1,0 +1,8 @@
+name = My search
+description = Search nodes in a database.
+package = Custom search
+core = 7.x
+version = "7.27"
+project = "mysearch"
+
+
