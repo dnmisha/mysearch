@@ -22,6 +22,7 @@ function mysearch_menu() {
     'page callback' => 'mysearch_searchpage',
     'page arguments' => array(1),
     'access arguments' => array('access mysearch'),
+    'type' => MENU_SUGGESTED_ITEM,
   );
   return $items;
 }
